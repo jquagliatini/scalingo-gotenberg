@@ -1,0 +1,4 @@
+bin/scalingo-gotenberg
+bin/pdfcpu
+vendor/
+.env

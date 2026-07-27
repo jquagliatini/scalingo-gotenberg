@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Ce script tourne AVANT `go build` dans le Go buildpack.
+# Il génère go.sum si absent — nécessaire pour un build reproductible
+# quand on ne commit pas go.sum (typiquement en démarrage de projet).
+
+if [ ! -f go.sum ]; then
+  echo "-----> go.sum absent, exécution de 'go mod tidy'"
+  go mod tidy
+fi

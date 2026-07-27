@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Ce script est exécuté par le Go buildpack Scalingo après `go build`.
+# Il installe pdfcpu et pdftk-all.jar (téléchargements externes utilisés par
+# Gotenberg), ainsi qu'un wrapper `pdftk` pour l'exécuter via `java`.
+# Le buildpack déplace tout ce qui est écrit dans `bin/` du build dir vers
+# `/app/bin/` à l'exécution.
+
+PDFCPU_VERSION="0.12.0"
+
+mkdir -p bin
+
+echo "-----> Installing pdfcpu v${PDFCPU_VERSION}"
+tmp=$(mktemp -d)
+curl -sSfL "https://github.com/pdfcpu/pdfcpu/releases/download/v${PDFCPU_VERSION}/pdfcpu_${PDFCPU_VERSION}_Linux_x86_64.tar.xz" \
+  | tar -xJf - -C "${tmp}"
+mv "${tmp}"/pdfcpu_*/pdfcpu bin/pdfcpu
+chmod +x bin/pdfcpu
+
+# Le binaire compilé par le Go buildpack s'appelle par défaut du nom du module
+# (`scalingo-gotenberg`). Rien à faire ici, mais on vérifie sa présence.
+if [ ! -f bin/scalingo-gotenberg ]; then
+  echo "WARN: bin/scalingo-gotenberg introuvable après compilation Go"
+fi
+
+echo "-----> Trimming installed fonts"
+mv -v .apt/usr/share/fonts/truetype/noto/NotoSans-*.ttf .apt/usr/share/fonts/truetype && \
+  rm -v .apt/usr/share/fonts/truetype/noto/*.ttf && \
+  mv -v .apt/usr/share/fonts/truetype/NotoSans-*.ttf .apt/usr/share/fonts/truetype/noto && \
+  rm -v -rf .apt/usr/share/fonts/opentype/montserrat && \
+  rm -v -rf .apt/usr/share/fonts/truetype/montserrat && \
+  rm -v -f .apt/usr/share/fonts/woff/montserrat/MontserratAlternates-*.{woff,woff2} && \
+  fc-cache -f
