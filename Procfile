@@ -1,1 +1,1 @@
-web: supervisord -c supervisord.conf
+app: supervisord -c supervisord.conf

@@ -11,7 +11,7 @@ Un dyno Scalingo `scalingo-24` avec :
 
 - **APT buildpack** — installe Google Chrome, qpdf, exiftool, fonts…
 - **Go buildpack** — compile Gotenberg v8.34.0 depuis les sources
-- **nginx buildpack** — reverse proxy `$PORT` → `127.0.0.1:3000`
+- **nginx buildpack** — reverse proxy `:8080` (interface privée) → `127.0.0.1:9091`
 - **supervisord** (PID 1) — orchestre `nginx` + `gotenberg`
 
 Le binaire pdfcpu est téléchargé par `bin/go-post-compile` (hook du Go
@@ -22,9 +22,18 @@ usages configurés dans `supervisord.conf`.
 
 ```bash
 scalingo create scalingo-gotenberg --stack scalingo-24
-scalingo -a scalingo-gotenberg scale web:1:L
 git push scalingo main
+# Le process type s'appelle `app` (et non `web`) : il n'est donc PAS routé
+# depuis Internet. On le démarre explicitement (les nouveaux types démarrent à 0) :
+scalingo -a scalingo-gotenberg scale app:1:L
 ```
+
+> **Non exposé sur Internet.** Le process type est nommé `app` au lieu de `web`,
+> donc le routeur public Scalingo ne lui envoie aucun trafic. nginx écoute sur
+> `$SCALINGO_PRIVATE_HOSTNAME:8080` (Private Network) avec repli sur
+> `127.0.0.1:8080`. Pour ré-exposer publiquement : renommer le process en `web`
+> dans le `Procfile` et remettre `listen <%= ENV['PORT'] %>;` dans
+> `servers.conf.erb`.
 
 Le fichier `.buildpacks` déclenche automatiquement le mode multi-buildpack
 (pas besoin de `BUILDPACK_URL`).
@@ -35,8 +44,10 @@ Le fichier `.buildpacks` déclenche automatiquement le mode multi-buildpack
 # 1. Logs de démarrage
 scalingo -a scalingo-gotenberg logs -n 200
 
-# 2. Health check
-curl https://scalingo-gotenberg.osc-fr1.scalingo.io/health
+# 2. Health check — depuis un autre conteneur DU MÊME Private Network
+#    (l'app n'a PAS d'URL publique). Depuis une session run :
+scalingo -a scalingo-gotenberg run bash
+> curl http://$SCALINGO_PRIVATE_HOSTNAME:8080/health
 
 # 3. Conversion Chromium
 curl -X POST https://scalingo-gotenberg.osc-fr1.scalingo.io/forms/chromium/convert/url \
@@ -62,7 +73,7 @@ scalingo -a scalingo-gotenberg run bash
 | `bin/start-gotenberg`| lance gotenberg, attend /health, tient la main    |
 | `servers.conf.erb`   | server nginx + rate limit + upstream gotenberg    |
 | `supervisord.conf`   | orchestration nginx (`bin/run`) + gotenberg       |
-| `Procfile`           | `web: supervisord -c supervisord.conf`            |
+| `Procfile`           | `app: supervisord -c supervisord.conf` (non-`web`)|
 
 ## Points d'attention
 
@@ -76,9 +87,11 @@ scalingo -a scalingo-gotenberg run bash
   directive `toolchain` à `go.mod` ou downgrade Gotenberg.
 - **Taille du slug** — Chrome + fonts restent gérables (~200 MB). Utiliser
   un dyno `M` ou `L` selon le trafic.
-- **Un seul port exposé** — nginx bind `$PORT`, Gotenberg reste sur
-  `127.0.0.1:9091` (choix d'un port hors plage `$PORT` typique de Scalingo
-  pour éviter toute collision). Vérifier après déploiement.
+- **Aucun port exposé sur Internet** — le process type `app` (≠ `web`/`tcp`)
+  n'est pas routé par le front public Scalingo. nginx bind
+  `$SCALINGO_PRIVATE_HOSTNAME:8080` (repli `127.0.0.1:8080`), Gotenberg reste
+  sur `127.0.0.1:9091`. Les deux ports sont fixes et distincts, plus aucune
+  dépendance à `$PORT` (qui n'est de toute façon injecté que pour un `web`).
 - **Choix `servers.conf.erb` vs `nginx.conf.erb`** — le nginx-buildpack
   Scalingo inclut `nginx.conf.erb` **à l'intérieur** d'un `server { }` déjà
   déclaré. Or `limit_req_zone` doit être au niveau `http { }`. On utilise

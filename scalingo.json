@@ -5,7 +5,7 @@
   "repository": "https://github.com/jquagliatini/scalingo-gotenberg",
   "stack": "scalingo-24",
   "formation": {
-    "web": {
+    "app": {
       "amount": 1,
       "size": "M"
     }
