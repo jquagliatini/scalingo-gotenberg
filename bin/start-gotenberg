@@ -12,7 +12,6 @@ HEALTH_TIMEOUT="${GOTENBERG_HEALTH_TIMEOUT:-90}"
   --api-port=9091 \
   --api-bind-ip=127.0.0.1 \
   --libreoffice-disable-routes=true \
-  --chromium-bin-path=/app/.apt/opt/google/chrome/google-chrome \
   --pdfengines-merge-engines=qpdf,pdfcpu \
   --pdfengines-split-engines=pdfcpu,qpdf \
   --pdfengines-encrypt-engines=qpdf,pdfcpu \
