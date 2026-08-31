@@ -18,6 +18,7 @@ HEALTH_TIMEOUT="${GOTENBERG_HEALTH_TIMEOUT:-90}"
   --pdfengines-rotate-engines=pdfcpu \
   --pdfengines-stamp-engines=pdfcpu \
   --pdfengines-convert-engines=pdfcpu \
+  --prometheus-disable-collect=true \
   &
 pid=$!
 
