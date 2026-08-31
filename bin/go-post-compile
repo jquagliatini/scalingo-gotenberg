@@ -18,6 +18,21 @@ curl -sSfL "https://github.com/pdfcpu/pdfcpu/releases/download/v${PDFCPU_VERSION
 mv "${tmp}"/pdfcpu_*/pdfcpu bin/pdfcpu
 chmod +x bin/pdfcpu
 
+# Fichiers d'hyphénation Chromium requis par Gotenberg (voir
+# pkg/modules/chromium). Chromium cherche `<dir>/<chromium-version>/hyph-<lang>.hyb`,
+# donc on conserve le sous-dossier versionné tel qu'il est dans l'image upstream.
+# Version alignée sur la release Gotenberg utilisée (cf. go.mod).
+GOTENBERG_REF="v8.34.0"
+CHROMIUM_HYPHEN_VERSION="120.0.6050.0"
+HYPHEN_DIR="chromium-hyphen-data/${CHROMIUM_HYPHEN_VERSION}"
+
+echo "-----> Downloading Chromium hyphenation data (fr, en-us, en-gb) from gotenberg ${GOTENBERG_REF}"
+mkdir -p "${HYPHEN_DIR}"
+for lang in fr en-us en-gb; do
+  curl -sSfL -o "${HYPHEN_DIR}/hyph-${lang}.hyb" \
+    "https://raw.githubusercontent.com/gotenberg/gotenberg/${GOTENBERG_REF}/build/chromium-hyphen-data/${CHROMIUM_HYPHEN_VERSION}/hyph-${lang}.hyb"
+done
+
 # Le binaire compilé par le Go buildpack s'appelle par défaut du nom du module
 # (`scalingo-gotenberg`). Rien à faire ici, mais on vérifie sa présence.
 if [ ! -f bin/scalingo-gotenberg ]; then
