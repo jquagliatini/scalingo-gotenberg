@@ -14,6 +14,10 @@
     "GOTENBERG_HEALTH_TIMEOUT": {
       "description": "Délai (en secondes) laissé à gotenberg pour répondre 2xx sur /health au démarrage avant que supervisord ne le relance.",
       "value": "90"
+    },
+    "CHROMIUM_BIN_PATH": {
+      "description": "The Chromium installation path",
+      "value": "/app/.apt/opt/google/chrome/google-chrome"
     }
   }
 }
