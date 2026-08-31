@@ -11,7 +11,6 @@ HEALTH_TIMEOUT="${GOTENBERG_HEALTH_TIMEOUT:-90}"
 /app/bin/scalingo-gotenberg \
   --api-port=9091 \
   --api-bind-ip=127.0.0.1 \
-  --libreoffice-disable-routes=true \
   --pdfengines-merge-engines=qpdf,pdfcpu \
   --pdfengines-split-engines=pdfcpu,qpdf \
   --pdfengines-encrypt-engines=qpdf,pdfcpu \
