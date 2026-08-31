@@ -1,0 +1,33 @@
+# Base
+tini
+ca-certificates
+curl
+
+# Chrome via dépôt officiel Google (chromium n'est plus un vrai paquet APT
+# sur Ubuntu 24.04 — c'est un stub qui déclenche snap, indisponible sur
+# le buildpack). Nécessite l'option [trusted=yes] pour éviter l'erreur
+# de signature GPG au moment du apt update.
+:repo:deb [trusted=yes] https://dl.google.com/linux/chrome/deb/ stable main
+google-chrome-stable
+
+# Python (utilisé par certaines routines de Chromium)
+python3
+
+# Moteurs PDF — on garde uniquement qpdf et pdfcpu (téléchargé dans
+# bin/go-post-compile). pdftk est écarté pour éviter d'embarquer une JRE.
+qpdf
+libimage-exiftool-perl
+
+# Polices (reprises du Dockerfile gotenberg v8.34)
+fonts-crosextra-carlito
+fonts-crosextra-caladea
+fonts-liberation
+fonts-liberation2
+fonts-dejavu
+fonts-noto-cjk
+fonts-noto-color-emoji
+fonts-noto-core
+fonts-montserrat
+
+# supervisord
+supervisor
