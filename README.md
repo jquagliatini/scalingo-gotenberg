@@ -1,5 +1,7 @@
 # scalingo-gotenberg
 
+[![Deploy on Scalingo](https://cdn.scalingo.com/deploy/button.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/jquagliatini/scalingo-gotenberg)
+
 Déploiement de [Gotenberg](https://gotenberg.dev/) sur Scalingo derrière un
 reverse proxy nginx, sans LibreOffice (route désactivée).
 
@@ -75,7 +77,8 @@ scalingo -a scalingo-gotenberg run bash
 - **Taille du slug** — Chrome + fonts restent gérables (~200 MB). Utiliser
   un dyno `M` ou `L` selon le trafic.
 - **Un seul port exposé** — nginx bind `$PORT`, Gotenberg reste sur
-  `127.0.0.1:3000`. Vérifier après déploiement.
+  `127.0.0.1:9091` (choix d'un port hors plage `$PORT` typique de Scalingo
+  pour éviter toute collision). Vérifier après déploiement.
 - **Choix `servers.conf.erb` vs `nginx.conf.erb`** — le nginx-buildpack
   Scalingo inclut `nginx.conf.erb` **à l'intérieur** d'un `server { }` déjà
   déclaré. Or `limit_req_zone` doit être au niveau `http { }`. On utilise
