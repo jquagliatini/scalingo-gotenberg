@@ -16,6 +16,8 @@ HEALTH_TIMEOUT="${GOTENBERG_HEALTH_TIMEOUT:-90}"
   --pdfengines-encrypt-engines=qpdf,pdfcpu \
   --pdfengines-watermark-engines=pdfcpu \
   --pdfengines-rotate-engines=pdfcpu \
+  --pdfengines-stamp-engines=pdfcpu \
+  --pdfengines-convert-engines=pdfcpu \
   &
 pid=$!
 
