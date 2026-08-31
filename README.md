@@ -1,6 +1,6 @@
 # scalingo-gotenberg
 
-[![Deploy on Scalingo](https://cdn.scalingo.com/deploy/button.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/jquagliatini/scalingo-gotenberg)
+[![Deploy on Scalingo](https://cdn.scalingo.com/deploy/button.svg)](https://dashboard.scalingo.com/create/app?source=https://github.com/jquagliatini/scalingo-gotenberg#main)
 
 Déploiement de [Gotenberg](https://gotenberg.dev/) sur Scalingo derrière un
 reverse proxy nginx, sans LibreOffice (route désactivée).
